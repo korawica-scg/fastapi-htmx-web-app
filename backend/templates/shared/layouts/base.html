@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>
-        {% block title %}FastAPI with HTMX{% endblock %}
-    </title>
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            {% block title %}FastAPI with HTMX{% endblock %}
+        </title>
 
-    {% block additional_css %}
-    {% endblock %}
-</head>
-<body>
-    <!-- Header -->
-    {% block header %}
-    {% include 'fragments/header.html' %}
-    {% endblock %}
+        {% block additional_css %}
+        {% endblock %}
+    </head>
+    <body>
+        <!-- Header -->
+        {% block header %}
+        {% include 'fragments/header.html' %}
+        {% endblock %}
 
-    <div class="app-main-content">
-        {% block main_content %}{% endblock %}
-    </div>
-
-    <!-- Footer -->
-    <footer class="app-footer">
-        <div class="app-footer-copyright">
-            FastAPI with <a href="https://htmx.org" target="_blank">HTMX</a>
+        <div class="app-main-content">
+            {% block main_content %}{% endblock %}
         </div>
-    </footer>
 
-    <script src="/static/js/htmx.min.js?v=1.5.0"></script>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="app-footer-copyright">
+                FastAPI with <a href="https://htmx.org" target="_blank">HTMX</a>
+            </div>
+        </footer>
 
-    {% block additional_js %}
-    {% endblock %}
-</body>
+        <script src="/static/js/htmx.min.js?v=1.5.0"></script>
+
+        {% block additional_js %}
+        {% endblock %}
+    </body>
 </html>

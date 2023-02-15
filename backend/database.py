@@ -1,9 +1,11 @@
+from typing import AsyncIterator
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
+
 )
 from sqlalchemy.exc import SQLAlchemyError
 from .config import settings
@@ -40,7 +42,8 @@ async_engine = create_async_engine(
     }
 )
 AsyncSessionLocal = async_sessionmaker(
-    bind=async_engine, autoflush=False, future=True, autocommit=False
+    bind=async_engine, autoflush=False, autocommit=False, future=True
+    # expire_on_commit=False
 )
 
 # Explicitly setting the indexes' namings according to your
@@ -81,7 +84,7 @@ async def get_session():
         session.close()
 
 
-async def get_async_session():
+async def get_async_session() -> AsyncIterator[sessionmaker]:
     """Get database session with asynchronous"""
     try:
         yield AsyncSessionLocal

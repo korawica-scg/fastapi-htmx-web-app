@@ -16,7 +16,7 @@ def create_app():
     # Initialize application
     app = FastAPI(
         title='FastAPI and HTMX',
-        dependencies=[Depends(get_query_token)],
+        # dependencies=[Depends(get_query_token)],
         openapi_url='/api/v1/openapi.json',
         docs_url='/api/v1/docs',
     )
@@ -54,8 +54,10 @@ def create_app():
 
     @app.on_event("startup")
     async def startup():
-        from .database import async_engine, Base
-        # create db tables
+        from .database import async_engine
+        from .database import Base
+
+        # Drop and Create tables in database
         async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)

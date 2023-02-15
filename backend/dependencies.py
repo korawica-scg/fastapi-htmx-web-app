@@ -4,6 +4,18 @@ from fastapi.templating import Jinja2Templates
 
 
 async def get_query_token(token: str):
+    """Get the token value from query string.
+    implemented:
+
+        ..> @router.get('...')
+        ... async def index(token = Depends(get_query_token)):
+        ...     return ...
+
+    usages:
+
+        ..> $ curl http://localhost:8000/?token=<token:string>
+
+    """
     if token != "test":
         raise HTTPException(status_code=400, detail="No `test` token provided")
 
@@ -16,11 +28,11 @@ async def common_parameters(
 
 def templates() -> Jinja2Templates:
     """
-    usages:
+    implemented:
 
         .>> @router.get('...')
         ... async def display(templates: Jinja2Templates = Depends(templates)):
-        ...
+        ...     return ...
 
     """
     return Jinja2Templates(
