@@ -21,6 +21,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
 
     # Create role inline for user.
     # role = Column(String, nullable=True, default='user')

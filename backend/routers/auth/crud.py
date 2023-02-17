@@ -22,3 +22,6 @@ def authenticate(
 def is_active(user: User) -> bool:
     return user.is_active
 
+
+def is_superuser(user: User) -> bool:
+    return user.is_superuser

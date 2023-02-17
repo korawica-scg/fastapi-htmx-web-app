@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 from typing import AsyncIterator
 from fastapi import Depends
@@ -7,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from .config import settings
 
 logger = logging.getLogger(__name__)
@@ -66,6 +68,17 @@ metadata = MetaData(
 Base = declarative_base(metadata=metadata)
 
 
+# @as_declarative()
+# class Base:
+#     id: Any
+#     __name__: str
+#
+#     # Generate __tablename__ automatically
+#     @declared_attr
+#     def __tablename__(cls) -> str:
+#         return cls.__name__.lower()
+
+
 class CustomBase(Base):
     __abstract__ = True
 
@@ -99,3 +112,18 @@ async def get_async_session() -> AsyncIterator[sessionmaker]:
 class BaseCRUD:
     def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
         self.async_session = session
+
+
+# def init_db():
+#     # Tables should be created with Alembic migrations. But if you don't want to use migrations,
+#     # create the tables un-commenting the next line
+#     # Base.metadata.create_all(bind=engine)
+#
+#     user = get_user_by_email(db, email=settings.FIRST_SUPERUSER)
+#     if not user:
+#         user_in = UserCreate(
+#             email=settings.FIRST_SUPERUSER,
+#             password=settings.FIRST_SUPERUSER_PASSWORD,
+#             is_superuser=True,
+#         )
+#         user = create(db, obj_in=user_in)

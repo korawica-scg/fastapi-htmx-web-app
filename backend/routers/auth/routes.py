@@ -14,10 +14,11 @@ from ...utils.utilities import (
 )
 from ..users.schemas import User as SchemaUser
 from ..users.models import User
+from ..users.crud import get_user_by_email
 from .crud import authenticate
 from .crud import is_active
 from .dependencies import get_current_user
-from .schemas import Token
+from .schemas import Token, Message
 
 
 auth = APIRouter(
@@ -62,47 +63,49 @@ def test_token(
     return current_user
 
 
-# @auth.post("/password-recovery/{email}", response_model=schemas.Msg)
-# def recover_password(email: str, db: Session = Depends(get_session)) -> Any:
-#     """
-#     Password Recovery
-#     """
-#     user = crud.user.get_by_email(db, email=email)
-#
-#     if not user:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="The user with this username does not exist in the system.",
-#         )
-#     password_reset_token = generate_password_reset_token(email=email)
-#     send_reset_password_email(
-#         email_to=user.email, email=email, token=password_reset_token
-#     )
-#     return {"msg": "Password recovery email sent"}
-#
-#
-# @auth.post("/reset-password/", response_model=schemas.Msg)
-# def reset_password(
-#     token: str = Body(...),
-#     new_password: str = Body(...),
-#     db: Session = Depends(get_session),
-# ) -> Any:
-#     """
-#     Reset password
-#     """
-#     email = verify_password_reset_token(token)
-#     if not email:
-#         raise HTTPException(status_code=400, detail="Invalid token")
-#     user = crud.user.get_by_email(db, email=email)
-#     if not user:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="The user with this username does not exist in the system.",
-#         )
-#     elif not crud.user.is_active(user):
-#         raise HTTPException(status_code=400, detail="Inactive user")
-#     hashed_password = get_password_hash(new_password)
-#     user.hashed_password = hashed_password
-#     db.add(user)
-#     db.commit()
-#     return {"msg": "Password updated successfully"}
+@auth.post("/password-recovery/{email}", response_model=Message)
+def recover_password(
+        email: str,
+        session: Session = Depends(get_session)
+) -> Any:
+    """
+    Password Recovery
+    """
+    user = get_user_by_email(session, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system.",
+        )
+    password_reset_token = generate_password_reset_token(email=email)
+    send_reset_password_email(
+        email_to=user.email, email=email, token=password_reset_token
+    )
+    return {"msg": "Password recovery email sent"}
+
+
+@auth.post("/reset-password/", response_model=Message)
+def reset_password(
+    token: str = Body(...),
+    new_password: str = Body(...),
+    session: Session = Depends(get_session),
+) -> Any:
+    """
+    Reset password
+    """
+    email = verify_password_reset_token(token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    user = get_user_by_email(session, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system.",
+        )
+    elif not is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    hashed_password = get_password_hash(new_password)
+    user.hashed_password = hashed_password
+    session.add(user)
+    session.commit()
+    return {"msg": "Password updated successfully"}

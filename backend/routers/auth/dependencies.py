@@ -7,13 +7,17 @@ from sqlalchemy.orm import Session
 from ...database import get_session
 from ...securities import ALGORITHM
 from ...config import settings
-from .schemas import TokenPayload
 from ..users.models import User
 from ..users.crud import get_user
+from .schemas import TokenPayload
+from .crud import (
+    is_active,
+    is_superuser,
+)
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"v{settings.APP_VERSION}/login/access-token"
+    tokenUrl="/api/v1/auth/login/access-token"
 )
 
 
@@ -40,7 +44,7 @@ def get_current_user(
 def get_current_active_user(
         current_user: User = Depends(get_current_user),
 ) -> User:
-    if not crud.user.is_active(current_user):
+    if not is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
@@ -48,7 +52,7 @@ def get_current_active_user(
 def get_current_active_superuser(
         current_user: User = Depends(get_current_user),
 ) -> User:
-    if not crud.user.is_superuser(current_user):
+    if not is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"
         )

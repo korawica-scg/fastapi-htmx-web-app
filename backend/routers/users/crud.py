@@ -11,6 +11,10 @@ from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate
 from .schemas import UserUpdate as SchemaUserUpdate
 
+"""
+the Synchronous CRUD functions for get any models from database.
+"""
+
 
 def get_user(session: Session, user_id: int) -> User:
     return session.query(User).filter(User.id == user_id).first()
@@ -28,28 +32,27 @@ def get_users(session: Session, skip: int = 0, limit: int = 100) -> list[User]:
     return session.query(User).offset(skip).limit(limit).all()
 
 
-class ReadUsers:
-    def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
-        self.async_session = session
+"""
+the Asynchronous CRUD classes for get any models from database.
+"""
 
+
+class ReadUsers(BaseCRUD):
     async def execute(self, skip: int = 0, limit: int = 100) -> AsyncIterator[SchemaUser]:
         async with self.async_session.begin() as session:
             async for user in User.get_all(session, skip, limit):
                 yield SchemaUser.from_orm(user)
 
 
-class CreateUser:
-    def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
-        self.async_session = session
-
+class CreateUser(BaseCRUD):
     async def execute(self, user: SchemaUserCreate) -> SchemaUser:
         async with self.async_session.begin() as session:
 
             # Validate by username value. By default, this will validate from database with
             # unique constraint.
-            # _user = await User.read_by_username(session, user.username)
-            # if _user:
-            #     raise HTTPException(status_code=409)
+            _user = await User.read_by_username(session, user.username)
+            if _user:
+                raise HTTPException(status_code=409)
 
             hashed_password = get_password_hash(user.password)
             _user_create: User = User(

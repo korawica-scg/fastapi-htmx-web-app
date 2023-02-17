@@ -20,6 +20,7 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    is_superuser: bool
 
     # FIXME: sqlalchemy.exc.MissingGreenlet
     # tickets: list[Ticket] = Field(min_items=0)
