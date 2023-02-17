@@ -14,7 +14,7 @@ Pre Version 0.0.1
 - [x] Initial users route
     - [x] Create CRUD
     - [ ] Create CRUD for ticket
-    - [ ] Migrate securities
+    - [ ] Migrate authentication and securities
   
 - [x] Initial tickets route
     - [x] Create CRUD (for anonymous)

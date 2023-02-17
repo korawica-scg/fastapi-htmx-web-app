@@ -20,7 +20,9 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    tickets: list[Ticket] = Field(min_items=0)
+
+    # FIXME: sqlalchemy.exc.MissingGreenlet
+    # tickets: list[Ticket] = Field(min_items=0)
 
     class Config:
         orm_mode = True

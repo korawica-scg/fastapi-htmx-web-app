@@ -1,3 +1,4 @@
+import logging
 from typing import AsyncIterator
 from fastapi import Depends
 from sqlalchemy import MetaData, create_engine
@@ -7,6 +8,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from .config import settings
+
+logger = logging.getLogger(__name__)
 
 engine = create_engine(
     settings.SQLALCHEMY_DATABASE_URL,
@@ -40,8 +43,8 @@ async_engine = create_async_engine(
     }
 )
 AsyncSessionLocal = async_sessionmaker(
-    bind=async_engine, autoflush=False, autocommit=False, future=True
-    # expire_on_commit=False
+    bind=async_engine, autoflush=False, autocommit=False, future=True,
+    expire_on_commit=False
 )
 
 # Explicitly setting the indexes' namings according to your
@@ -87,7 +90,10 @@ async def get_async_session() -> AsyncIterator[sessionmaker]:
     try:
         yield AsyncSessionLocal
     except SQLAlchemyError as err:
-        print(err)
+        logger.error(err)
+    finally:
+        # await async_engine.dispose()
+        ...
 
 
 class BaseCRUD:

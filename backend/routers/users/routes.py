@@ -43,7 +43,8 @@ async def create(
     service: CreateUser = Depends(CreateUser),
 ) -> SchemaUser:
     """CRUD of user"""
-    return await service.execute(user)
+    user: SchemaUser = await service.execute(user)
+    return user
 
 
 @users.put("/{user_id}", response_model=SchemaUser)

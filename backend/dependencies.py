@@ -22,12 +22,6 @@ async def get_query_token(token: str):
         raise HTTPException(status_code=400, detail="No `test` token provided")
 
 
-async def common_parameters(
-    q: Union[str, None] = None, skip: int = 0, limit: int = 100
-):
-    return {"q": q, "skip": skip, "limit": limit}
-
-
 async def templates() -> Jinja2Templates:
     """Return Jinja2 template object for HTMLResponse in this application.
 

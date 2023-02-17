@@ -2,7 +2,6 @@ import uuid
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Cookie
-from fastapi import Form
 from fastapi import Request
 from fastapi import Response
 from fastapi import status
@@ -13,7 +12,6 @@ from .crud import ReadTickets
 from .crud import CreateTicket
 from .crud import UpdateTicket
 from .crud import DeleteTicket
-from .schemas import TicketCreate as SchemaTicketCreate
 from .schemas import Ticket as SchemaTicket
 from .schemas import TicketCreateForm
 from ...dependencies import templates

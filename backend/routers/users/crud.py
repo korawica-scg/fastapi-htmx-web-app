@@ -4,24 +4,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncIterator
 from .models import User
 from ...database import get_async_session
+from ...database import BaseCRUD
+from ...securities import get_password_hash
+from ...securities import verify_password
 from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate
 from .schemas import UserUpdate as SchemaUserUpdate
 
 
-def get_user(session: Session, user_id: int):
+def get_user(session: Session, user_id: int) -> User:
     return session.query(User).filter(User.id == user_id).first()
 
 
-def get_user_by_email(session: Session, email: str):
+def get_user_by_email(session: Session, email: str) -> User:
     return session.query(User).filter(User.email == email).first()
 
 
-def get_user_by_username(session: Session, username: str):
+def get_user_by_username(session: Session, username: str) -> User:
     return session.query(User).filter(User.username == username).first()
 
 
-def get_users(session: Session, skip: int = 0, limit: int = 100):
+def get_users(session: Session, skip: int = 0, limit: int = 100) -> list[User]:
     return session.query(User).offset(skip).limit(limit).all()
 
 
@@ -29,9 +32,9 @@ class ReadUsers:
     def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
         self.async_session = session
 
-    async def execute(self, skip: int, limit: int) -> AsyncIterator[SchemaUser]:
+    async def execute(self, skip: int = 0, limit: int = 100) -> AsyncIterator[SchemaUser]:
         async with self.async_session.begin() as session:
-            async for user in User.get_all(session):
+            async for user in User.get_all(session, skip, limit):
                 yield SchemaUser.from_orm(user)
 
 
@@ -44,15 +47,15 @@ class CreateUser:
 
             # Validate by username value. By default, this will validate from database with
             # unique constraint.
-            _user = await User.read_by_username(session, user.username)
-            if _user:
-                raise HTTPException(status_code=409)
+            # _user = await User.read_by_username(session, user.username)
+            # if _user:
+            #     raise HTTPException(status_code=409)
 
-            fake_hashed_password = f'{user.password}****'
+            hashed_password = get_password_hash(user.password)
             _user_create: User = User(
                 email=user.email,
                 username=user.username,
-                hashed_password=fake_hashed_password
+                hashed_password=hashed_password
             )
             session.add(_user_create)
 

@@ -95,11 +95,9 @@ def create_app():
     # )
 
     # Add routers to the app
-    from .routers import users
-    from .routers import tickets
+    from .routers import api_router
     from .routers import ticket_view
-    app.include_router(users, prefix=f'/api/v{settings.APP_VERSION}')
-    app.include_router(tickets, prefix=f'/api/v{settings.APP_VERSION}')
+    app.include_router(api_router, prefix=f'/api/v{settings.APP_VERSION}')
     app.include_router(ticket_view, prefix=f'/view')
 
     @app.get("/", include_in_schema=False)

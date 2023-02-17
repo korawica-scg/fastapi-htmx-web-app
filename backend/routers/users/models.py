@@ -63,11 +63,15 @@ class User(Base):
     async def get_all(
             cls,
             session: AsyncSession,
+            skip: int = 0,
+            limit: int = 100,
             include_tickets: bool = False,
     ) -> AsyncIterator['User']:
         stmt = select(cls)
         if include_tickets:
             stmt = stmt.options(selectinload(cls.tickets))
+        if skip > 0 and limit > 0:
+            stmt = stmt.offset(skip).limit(limit)
         stream = await session.stream(stmt.order_by(cls.id))
         async for row in stream:
             yield row.User

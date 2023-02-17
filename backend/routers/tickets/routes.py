@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from .schemas import Ticket as SchemaTicket
-from .schemas import TicketCreate as SchemaTicketCreate
+from .schemas import TicketCreateForm
 from .crud import get_tickets
 from .crud import CreateTicket
 from ...database import get_session
@@ -28,8 +28,8 @@ def read_all(
 
 @tickets.post("/", response_model=SchemaTicket)
 async def create(
-    user: SchemaTicketCreate,
+    user: TicketCreateForm = Depends(TicketCreateForm),
     service: CreateTicket = Depends(CreateTicket),
 ) -> SchemaTicket:
     """CRUD of user"""
-    return await service.execute(user)
+    return await service.execute(user, session_key='')

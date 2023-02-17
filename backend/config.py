@@ -1,5 +1,6 @@
-import logging
 import os
+import logging
+import secrets
 import pathlib
 from typing import Dict
 from pydantic import BaseSettings
@@ -9,7 +10,7 @@ from functools import lru_cache
 load_dotenv(dotenv_path='../.env')
 
 
-# https://docs.pydantic.dev/usage/settings/
+# docs: https://docs.pydantic.dev/usage/settings/
 class Settings(BaseSettings):
     """
     usages:
@@ -26,6 +27,10 @@ class Settings(BaseSettings):
 class BaseConfig:
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
     APP_VERSION: int = 1
+
+    # Security Configuration
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
     # SQLAlchemy Configuration
     SQLALCHEMY_DATABASE_URL: str = os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR}/db.sqlite3")
