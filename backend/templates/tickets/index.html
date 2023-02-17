@@ -1,0 +1,37 @@
+{% extends 'shared/layouts/base.html' %}
+{% block content %}
+<div>
+    <form id="ticketForm"
+          hx-post="/view/"
+          hx-swap="beforeend"
+          hx-target="#ticketItems"
+          hx-trigger="submit">
+        <div>
+            <input id="textInput"
+                   autocomplete="off"
+                   type="text"
+                   name="text"
+                   placeholder="Write your text here...">
+            <input id="descriptionInput"
+                   autocomplete="off"
+                   type="text"
+                   name="description"
+                   placeholder="Write your description here...">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+    <ul id="ticketItems" hx-target="closest li" hx-swap="outerHTML">
+        {% for ticket in tickets %}
+        {% include 'tickets/partials/ticket.html' with context %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+{% block additional_js %}
+    <script>
+        htmx.on('htmx:afterSwap', function(event) {
+            document.getElementById("textInput").value = "";
+            document.getElementById("descriptionInput").value = "";
+        });
+    </script>
+{% endblock %}

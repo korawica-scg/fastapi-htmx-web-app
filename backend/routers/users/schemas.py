@@ -1,7 +1,7 @@
 from pydantic import EmailStr
 from pydantic import BaseModel
 from pydantic import Field
-from ..tickets.schemas import Item
+from ..tickets.schemas import Ticket
 
 
 class UserBase(BaseModel):
@@ -20,7 +20,7 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    todos: list[Item] = Field(min_items=0)
+    tickets: list[Ticket] = Field(min_items=0)
 
     class Config:
         orm_mode = True

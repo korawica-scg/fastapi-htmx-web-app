@@ -1,27 +1,20 @@
-from fastapi import (
-    Request,
-    APIRouter,
-    Depends,
-    HTTPException,
-    Path,
-    Form,
-    status,
-)
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import Path
+from fastapi import Form
+from fastapi import status
 from .dependencies import get_token_header
 from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate
 from .schemas import UserUpdate as SchemaUserUpdate
-from .schemas import Item
 from .crud import ReadUsers
 from .crud import ReadUser
 from .crud import CreateUser
 from .crud import UpdateUser
 from .crud import DeleteUser
-from .crud import get_user
-from ..tickets.schemas import ItemCreate
-from ..tickets.crud import create_user_item
-from ...database import get_session
+from ..tickets.schemas import Ticket as SchemaTicket
+from ..tickets.schemas import TicketCreate as SchemaTicketCreate
+from ..tickets.crud import CreateUserTicket
 
 
 users = APIRouter(
@@ -81,10 +74,11 @@ async def read(
     return await service.execute(user_id)
 
 
-@users.post("/{user_id}/todos/", response_model=Item)
-def create_item_for_user(
-        item: ItemCreate,
-        user_id: int = Path(title="The ID of the user to get", ge=1),
-        session: Session = Depends(get_session),
-):
-    return create_user_item(session=session, item=item, user_id=user_id)
+@users.post("/{user_id}/tickets/", response_model=SchemaTicket)
+async def create_ticket(
+    ticket: SchemaTicketCreate,
+    user_id: int = Path(title="The ID of the user to get", ge=1),
+    service: CreateUserTicket = Depends(CreateUserTicket),
+) -> SchemaTicket:
+    """CRUD of user's ticket"""
+    return await service.execute(ticket, user_id)

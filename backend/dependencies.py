@@ -1,10 +1,12 @@
 from typing import Union
 from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
+from .config import settings
 
 
 async def get_query_token(token: str):
     """Get the token value from query string.
+
     implemented:
 
         ..> @router.get('...')
@@ -26,8 +28,9 @@ async def common_parameters(
     return {"q": q, "skip": skip, "limit": limit}
 
 
-def templates() -> Jinja2Templates:
-    """
+async def templates() -> Jinja2Templates:
+    """Return Jinja2 template object for HTMLResponse in this application.
+
     implemented:
 
         .>> @router.get('...')
@@ -36,9 +39,10 @@ def templates() -> Jinja2Templates:
 
     """
     return Jinja2Templates(
-        directory='/templates',
+        directory=f'{settings.BASE_DIR}/backend/templates',
         autoescape=True,
         lstrip_blocks=True,
+
         # Handle multi-template folders in the FastAPI application with the Starlette.
         # docs: https://accent-starlette.github.io/starlette-core/templating/
         # loader=jinja2.ChoiceLoader(

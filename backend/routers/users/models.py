@@ -27,9 +27,9 @@ class User(Base):
 
     # Create relationship to Tickets model
     tickets = relationship(
-        "Ticket",
+        "UserTicket",
         back_populates="owner",
-        order_by="Ticket.id",
+        order_by="UserTicket.id",
         cascade="save-update, merge, refresh-expire, expunge, delete, delete-orphan",
     )
 

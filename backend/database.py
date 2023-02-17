@@ -1,12 +1,10 @@
 from typing import AsyncIterator
+from fastapi import Depends
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-    async_sessionmaker,
-
-)
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from .config import settings
 
@@ -90,3 +88,8 @@ async def get_async_session() -> AsyncIterator[sessionmaker]:
         yield AsyncSessionLocal
     except SQLAlchemyError as err:
         print(err)
+
+
+class BaseCRUD:
+    def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
+        self.async_session = session

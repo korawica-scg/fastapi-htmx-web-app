@@ -12,11 +12,12 @@
     <body>
         <!-- Header -->
         {% block header %}
-        {% include 'fragments/header.html' %}
+            {% include 'shared/fragments/header.html' %}
         {% endblock %}
 
+        <!-- Content -->
         <div class="app-main-content">
-            {% block main_content %}{% endblock %}
+            {% block content %}{% endblock %}
         </div>
 
         <!-- Footer -->
@@ -25,9 +26,10 @@
                 FastAPI with <a href="https://htmx.org" target="_blank">HTMX</a>
             </div>
         </footer>
-
-        <script src="/static/js/htmx.min.js?v=1.5.0"></script>
-
+        <script src="https://unpkg.com/htmx.org@1.8.5"
+                integrity="sha384-7aHh9lqPYGYZ7sTHvzP1t3BAfLhYSTy9ArHdP3Xsr9/3TlGurYgcPBoFmXX2TX/w"
+                crossorigin="anonymous">
+        </script>
         {% block additional_js %}
         {% endblock %}
     </body>
