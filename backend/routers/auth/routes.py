@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Any
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from ...database import get_session
@@ -30,24 +30,38 @@ auth = APIRouter(
 @auth.post("/login/access-token", response_model=Token)
 def login_access_token(
     session: Session = Depends(get_session),
-    form_data: OAuth2PasswordRequestForm = Depends()
+    form_data: OAuth2PasswordRequestForm = Depends(OAuth2PasswordRequestForm)
 ) -> Any:
-    """
-    OAuth2 compatible token login, get an access token for future requests
-    """
+    """OAuth2 compatible token login, get an access token for future requests"""
     user = authenticate(
         session,
         email=form_data.username,
         password=form_data.password,
     )
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     elif not is_active(user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user",
+
+            # Add the header WWW-Authenticate to make the browser show the login prompt again.
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
-            user.id,
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            subject={
+                "sub": user.username,
+
+                # OAuth2 with scopes.
+                "scopes": form_data.scopes,
+            },
+            expires_delta=access_token_expires
         ),
         "token_type": "bearer",
     }
@@ -55,11 +69,9 @@ def login_access_token(
 
 @auth.post("/login/test-token", response_model=SchemaUser)
 def test_token(
-        current_user: User = Depends(get_current_user)
+        current_user: User = Security(get_current_user, scopes=["me"]),
 ) -> Any:
-    """
-    Test access token
-    """
+    """Test access token"""
     return current_user
 
 
@@ -68,9 +80,7 @@ def recover_password(
         email: str,
         session: Session = Depends(get_session)
 ) -> Any:
-    """
-    Password Recovery
-    """
+    """Password Recovery"""
     user = get_user_by_email(session, email=email)
     if not user:
         raise HTTPException(
@@ -90,12 +100,12 @@ def reset_password(
     new_password: str = Body(...),
     session: Session = Depends(get_session),
 ) -> Any:
-    """
-    Reset password
-    """
+    """Reset password"""
     email = verify_password_reset_token(token)
     if not email:
-        raise HTTPException(status_code=400, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token"
+        )
     user = get_user_by_email(session, email=email)
     if not user:
         raise HTTPException(
@@ -103,7 +113,9 @@ def reset_password(
             detail="The user with this username does not exist in the system.",
         )
     elif not is_active(user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
     hashed_password = get_password_hash(new_password)
     user.hashed_password = hashed_password
     session.add(user)

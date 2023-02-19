@@ -4,6 +4,7 @@ from fastapi import Depends
 from fastapi import Cookie
 from fastapi import Request
 from fastapi import Response
+from fastapi.responses import PlainTextResponse
 from fastapi import status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -84,10 +85,10 @@ async def ticket_update_put(
     return template.TemplateResponse("tickets/partials/ticket.html", context)
 
 
-@tickets.delete("/{item_id}/", response_class=Response)
+@tickets.delete("/{item_id}/", response_class=PlainTextResponse)
 async def ticket_delete(
         item_id: int,
         service: DeleteTicket = Depends(DeleteTicket),
 ):
     await service.execute(item_id)
-    return Response(status_code=status.HTTP_200_OK)
+    return ""

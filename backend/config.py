@@ -109,7 +109,7 @@ class Settings(BaseSettings):
 class BaseConfig:
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
     APP_VERSION: int = 1
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost']
 
     # Security Configuration
     SECRET_KEY: str = secrets.token_urlsafe(32)

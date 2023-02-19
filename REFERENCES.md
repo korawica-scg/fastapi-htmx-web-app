@@ -12,7 +12,8 @@ References
 ### Uses-case
 
 - [ ] [ ](https://github.com/marty331/fasthtmx)
-- [ ] [ ](https://github.com/renceInbox/fastapi-todo)
+- [ ] [TODO application with FastAPI](https://github.com/renceInbox/fastapi-todo)
+- [ ] [Rocketry with FastAPI](https://github.com/Miksus/rocketry-with-fastapi)
 
 
 ### Comparison

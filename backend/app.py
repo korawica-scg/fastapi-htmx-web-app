@@ -6,10 +6,14 @@ from logging.config import dictConfig
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi import Depends
-from fastapi import Request
+from fastapi import Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from .dependencies import get_query_token
 from .config import settings
 
@@ -22,6 +26,7 @@ def create_app():
     # Initialize application
     app = FastAPI(
         title='FastAPI and HTMX',
+        description="Full Web application with FastAPI for backend and HTMX + CSS for frontend.",
         version="0.0.1",
         # dependencies=[Depends(get_query_token)],
 
@@ -102,8 +107,12 @@ def create_app():
     async def health() -> JSONResponse:
         return JSONResponse({"message": "It worked!!"})
 
+    # Define event handlers (functions) that need to be executed before the application
+    # starts up, or when the application is shutting down.
+    # docs: https://fastapi.tiangolo.com/advanced/events/
     @app.on_event("startup")
     async def startup():
+        """Handlers event before app start-up"""
         from .database import async_engine
         from .database import Base
 
@@ -112,4 +121,23 @@ def create_app():
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
+    @app.on_event("shutdown")
+    def shutdown_event():
+        """Handlers event before app shutting-down"""
+        ...
+
+    @app.exception_handler(StarletteHTTPException)
+    async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+        return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
+
+    # RequestValidationError is a sub-class of Pydantic's ValidationError
+    # docs: https://fastapi.tiangolo.com/tutorial/handling-errors/
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
+        )
+
     return app
+

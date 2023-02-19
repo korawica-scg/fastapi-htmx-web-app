@@ -75,10 +75,8 @@ class DeleteTicket(BaseCRUD):
     async def execute(self, ticket_id: int):
         async with self.async_session.begin() as session:
             ticket = await Ticket.read_by_id(session, ticket_id)
-            print(ticket)
-            # if not ticket:
-            #     raise HTTPException(status_code=404)
-
+            if not ticket:
+                raise HTTPException(status_code=404)
             await session.delete(ticket)
             await session.flush()
             return SchemaTicket.from_orm(ticket)
