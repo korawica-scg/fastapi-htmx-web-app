@@ -6,7 +6,10 @@ from typing import Dict, List, Union, Optional, Any
 from pydantic import (
     BaseSettings,
     AnyHttpUrl,
-    validator, PostgresDsn, EmailStr, HttpUrl
+    validator,
+    PostgresDsn,
+    EmailStr,
+    HttpUrl,
 )
 from dotenv import load_dotenv
 from functools import lru_cache
@@ -97,7 +100,7 @@ class Settings(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
     class Config:
-        # For dotenv file.
+        # # For get configuration from `.env` file.
         # env = os.environ["APP_ENV"]
         # env_file = pathlib.Path(__file__).parent.parent / ".env"
         case_sensitive = True
@@ -106,6 +109,7 @@ class Settings(BaseSettings):
 class BaseConfig:
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
     APP_VERSION: int = 1
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost:8000']
 
     # Security Configuration
     SECRET_KEY: str = secrets.token_urlsafe(32)

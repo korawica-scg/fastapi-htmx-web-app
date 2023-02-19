@@ -69,7 +69,7 @@ class CreateUser(BaseCRUD):
             # docs: https://stackoverflow.com/questions/4201455/sqlalchemy-whats-the-difference-between-flush-and-commit
             await session.flush()
 
-            # `commit`, commits (persists) those changes to the database.
+            # # `commit`, commits (persists) those changes to the database.
             # await session.commit()
 
             # persisted some changes for an object to the database and need to use this updated
@@ -79,7 +79,7 @@ class CreateUser(BaseCRUD):
 
 
 class ReadUser:
-    def __init__(self, session: Session = Depends(get_async_session)) -> None:
+    def __init__(self, session: sessionmaker = Depends(get_async_session)) -> None:
         self.async_session = session
 
     async def execute(self, user_id: int) -> SchemaUser:

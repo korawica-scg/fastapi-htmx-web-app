@@ -14,7 +14,7 @@ from .crud import UpdateTicket
 from .crud import DeleteTicket
 from .schemas import Ticket as SchemaTicket
 from .schemas import TicketCreateForm
-from ...dependencies import templates
+from ...dependencies import get_templates
 
 tickets = APIRouter(
     tags=["ticket-views"],
@@ -28,7 +28,7 @@ tickets = APIRouter(
 async def ticket_read(
         request: Request,
         session_key: str = Cookie(default=uuid.uuid4().hex),
-        template: Jinja2Templates = Depends(templates),
+        template: Jinja2Templates = Depends(get_templates),
         service: ReadTickets = Depends(ReadTickets),
 ):
     _tickets = service.execute(session_key)
@@ -50,7 +50,7 @@ async def ticket_read(
 async def ticket_create(
         request: Request,
         ticket: TicketCreateForm = Depends(TicketCreateForm.as_form),
-        template: Jinja2Templates = Depends(templates),
+        template: Jinja2Templates = Depends(get_templates),
         service: CreateTicket = Depends(CreateTicket),
 ):
     session_key = request.cookies.get("session_key")
@@ -63,7 +63,7 @@ async def ticket_create(
 async def ticket_update_get(
         request: Request,
         item_id: int,
-        template: Jinja2Templates = Depends(templates),
+        template: Jinja2Templates = Depends(get_templates),
         service: ReadTicket = Depends(ReadTicket),
 ):
     ticket = await service.execute(item_id)
@@ -76,7 +76,7 @@ async def ticket_update_put(
         request: Request,
         item_id: int,
         ticket: TicketCreateForm = Depends(TicketCreateForm.as_form),
-        template: Jinja2Templates = Depends(templates),
+        template: Jinja2Templates = Depends(get_templates),
         service: UpdateTicket = Depends(UpdateTicket),
 ):
     ticket = await service.execute(item_id, ticket)

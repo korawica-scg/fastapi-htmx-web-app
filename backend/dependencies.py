@@ -1,4 +1,3 @@
-from typing import Union
 from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
 from .config import settings
@@ -22,7 +21,7 @@ async def get_query_token(token: str):
         raise HTTPException(status_code=400, detail="No `test` token provided")
 
 
-async def templates() -> Jinja2Templates:
+async def get_templates() -> Jinja2Templates:
     """Return Jinja2 template object for HTMLResponse in this application.
 
     implemented:
@@ -35,10 +34,12 @@ async def templates() -> Jinja2Templates:
     return Jinja2Templates(
         directory=f'{settings.BASE_DIR}/backend/templates',
         autoescape=True,
+
+        # Strip left of spaces in any blocks of HTML template.
         lstrip_blocks=True,
 
-        # Handle multi-template folders in the FastAPI application with the Starlette.
-        # docs: https://accent-starlette.github.io/starlette-core/templating/
+        # # Handle multi-template folders in the FastAPI application with the Starlette.
+        # # docs: https://accent-starlette.github.io/starlette-core/templating/
         # loader=jinja2.ChoiceLoader(
         #     [
         #         jinja2.FileSystemLoader("templates"),

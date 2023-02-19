@@ -4,6 +4,7 @@ import random
 import logging
 from logging.config import dictConfig
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi import Depends
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -12,34 +13,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from .dependencies import get_query_token
 from .config import settings
 
-# dictConfig(settings.LOGGING_CONF)
-# dictConfig({
-#     "version": 1,
-#     'disable_existing_loggers': True,
-#     'handlers': {
-#         'console': {
-#             "level": 'DEBUG',
-#             "class": 'logging.StreamHandler',
-#             "stream": "ext://sys.stdout",
-#         }
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG'
-#     }
-# })
+
 logger = logging.getLogger(__name__)
 
 
 def create_app():
-    """FastAPI application factory
-    :return:
-    """
+    """FastAPI application factory"""
     # Initialize application
     app = FastAPI(
         title='FastAPI and HTMX',
         version="0.0.1",
         # dependencies=[Depends(get_query_token)],
+
+        # docs: https://fastapi.tiangolo.com/advanced/extending-openapi/
         openapi_url='/api/v1/openapi.json',
         openapi_tags=[
             {
@@ -56,6 +42,7 @@ def create_app():
             },
         ],
         docs_url='/api/v1/docs',
+        redoc_url='/api/v1/redoc',
     )
 
     # Mount the static folder to the app for use in Jinja2 template.
@@ -63,10 +50,21 @@ def create_app():
     # docs: https://fastapi.tiangolo.com/advanced/templates/
     app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 
-    # Add CORS middleware to the app
+    # Add CORS (Cross-Origin Resource Sharing) middleware to the app.
+    # ---
+    # Is there any reason it is necessary to validate client-side if we just take
+    # the API we've been validating before it will throw the following error Server-side
+    # access to the API is allowed so we need to define a domain. To access the API,
+    # we will define CORS, which will allow more than one domain. Let us install it
+    # in the API label.
+    # docs: https://stackpython.co/tutorial/api-python-fastapi
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=['*'],
+
+        # Define origins is a domain that allows access to more than 1 API and I
+        # added it to the middleware of the app. This will affect every API.
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+
         allow_methods=['*'],
         allow_headers=['*'],
         allow_credentials=True,
@@ -94,13 +92,13 @@ def create_app():
     #     responses={418: {"description": "I'm a teapot"}},
     # )
 
-    # Add routers to the app
+    # Add routers to the application
     from .routers import api_router
     from .routers import ticket_view
     app.include_router(api_router, prefix=f'/api/v{settings.APP_VERSION}')
-    app.include_router(ticket_view, prefix=f'/view')
+    app.include_router(ticket_view)
 
-    @app.get("/", include_in_schema=False)
+    @app.get(f"/api/v{settings.APP_VERSION}/health", include_in_schema=False)
     async def health() -> JSONResponse:
         return JSONResponse({"message": "It worked!!"})
 
@@ -109,7 +107,7 @@ def create_app():
         from .database import async_engine
         from .database import Base
 
-        # Drop and Create tables in database
+        # Drop and Create tables in database without async
         async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)

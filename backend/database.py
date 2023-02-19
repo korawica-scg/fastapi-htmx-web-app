@@ -27,7 +27,7 @@ engine = create_engine(
     }
 )
 SessionLocal = sessionmaker(
-    bind=engine, autoflush=False, autocommit=False
+    bind=engine, autoflush=False, autocommit=False, future=True
 )
 
 async_engine = create_async_engine(
@@ -45,7 +45,12 @@ async_engine = create_async_engine(
     }
 )
 AsyncSessionLocal = async_sessionmaker(
-    bind=async_engine, autoflush=False, autocommit=False, future=True,
+    bind=async_engine, autoflush=False, autocommit=False,
+    # The "future" flag is a mechanism to allow a seamless shift from prior versions
+    # of SQLAlchemy to the new v2.0. The interim version (v1.4) has a foot on each
+    # side of the transition.
+    # docs: https://docs.sqlalchemy.org/en/14/tutorial/index.html
+    future=True,
     expire_on_commit=False
 )
 

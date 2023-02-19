@@ -1,5 +1,5 @@
 <li>
-    <a href="#" hx-swap="outerHTML" hx-get="/view/{{ ticket.id }}/"><p>{{ ticket.text }}</p></a>
+    <a href="#" hx-swap="outerHTML" hx-get="{{ url_for('ticket_update_get', item_id=ticket.id) }}"><p>{{ ticket.text }}</p></a>
     <p>{{ ticket.description }}</p>
-    <button hx-delete="/view/{{ ticket.id }}/">Delete</button>
+    <button hx-delete="{{ url_for('ticket_delete', item_id=ticket.id) }}">Delete</button>
 </li>

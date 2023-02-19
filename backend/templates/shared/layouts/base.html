@@ -6,6 +6,8 @@
             {% block title %}FastAPI with HTMX{% endblock %}
         </title>
 
+        <link href="{{ url_for('static', path='css/base.css') }}" rel="stylesheet">
+
         {% block additional_css %}
         {% endblock %}
     </head>

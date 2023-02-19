@@ -1,7 +1,7 @@
 <li hx-swap="outerHTML"
     hx-target="this">
     <form id="ticketForm"
-          hx-put="/view/{{ ticket.id }}/"
+          hx-put="{{ url_for('ticket_update_put', item_id=ticket.id) }}"
           hx-trigger="submit">
         <input autocomplete="off" autofocus type="text" name="text" value="{{ ticket.text }}">
         <input autocomplete="off" autofocus type="text" name="description" value="{{ ticket.description }}">

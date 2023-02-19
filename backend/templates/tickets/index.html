@@ -2,7 +2,7 @@
 {% block content %}
 <div>
     <form id="ticketForm"
-          hx-post="/view/"
+          hx-post="{{ url_for('ticket_create') }}"
           hx-swap="beforeend"
           hx-target="#ticketItems"
           hx-trigger="submit">
