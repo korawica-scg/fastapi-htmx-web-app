@@ -1,12 +1,13 @@
 from typing import Any
 import logging
-from typing import AsyncIterator
+from typing import AsyncIterator, AsyncGenerator
 from fastapi import Depends
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from .config import settings
@@ -73,17 +74,6 @@ metadata = MetaData(
 Base = declarative_base(metadata=metadata)
 
 
-# @as_declarative()
-# class Base:
-#     id: Any
-#     __name__: str
-#
-#     # Generate __tablename__ automatically
-#     @declared_attr
-#     def __tablename__(cls) -> str:
-#         return cls.__name__.lower()
-
-
 class CustomBase(Base):
     __abstract__ = True
 
@@ -112,6 +102,12 @@ async def get_async_session() -> AsyncIterator[sessionmaker]:
     finally:
         # await async_engine.dispose()
         ...
+
+
+async def get_async_session_open() -> AsyncGenerator[AsyncSession, None]:
+    """Get database session with open asynchronous"""
+    async with AsyncSessionLocal() as session:
+        yield session
 
 
 class BaseCRUD:

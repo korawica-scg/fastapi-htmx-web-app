@@ -3,9 +3,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Cookie
 from fastapi import Request
-from fastapi import Response
 from fastapi.responses import PlainTextResponse
-from fastapi import status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from .crud import ReadTicket
@@ -15,10 +13,12 @@ from .crud import UpdateTicket
 from .crud import DeleteTicket
 from .schemas import Ticket as SchemaTicket
 from .schemas import TicketCreateForm
+from ..users.dependencies import get_current_user_optional
 from ...dependencies import get_templates
 
 tickets = APIRouter(
     tags=["ticket-views"],
+    prefix='/ticket',
     responses={
         # 404: {"description": "Not found"}
     },
@@ -31,7 +31,9 @@ async def ticket_read(
         session_key: str = Cookie(default=uuid.uuid4().hex),
         template: Jinja2Templates = Depends(get_templates),
         service: ReadTickets = Depends(ReadTickets),
+        # current_user=Depends(get_current_user_optional),
 ):
+    # print(f"Current user: {current_user}")
     _tickets = service.execute(session_key)
     context = {
         "request": request,
@@ -61,7 +63,7 @@ async def ticket_create(
 
 
 @tickets.get("/{item_id}/", response_class=HTMLResponse)
-async def ticket_update_get(
+async def ticket_update(
         request: Request,
         item_id: int,
         template: Jinja2Templates = Depends(get_templates),
@@ -73,7 +75,7 @@ async def ticket_update_get(
 
 
 @tickets.put("/{item_id}/", response_class=HTMLResponse)
-async def ticket_update_put(
+async def ticket_update(
         request: Request,
         item_id: int,
         ticket: TicketCreateForm = Depends(TicketCreateForm.as_form),

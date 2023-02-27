@@ -1,0 +1,17 @@
+<form id="loginForm"
+      hx-post="{{ url_for('login') }}"
+      hx-trigger="submit">
+    <div>
+        <input id="usernameInput"
+               autocomplete="off"
+               type="text"
+               name="username"
+               placeholder="Username...">
+        <input id="passwordInput"
+               autocomplete="off"
+               type="password"
+               name="password"
+               placeholder="Password...">
+        <button type="submit">Submit</button>
+    </div>
+</form>

@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from fastapi.routing import APIRoute
 from fastapi.templating import Jinja2Templates
 from .config import settings
 
@@ -47,3 +48,7 @@ async def get_templates() -> Jinja2Templates:
         #     ]
         # )
     )
+
+
+def custom_generate_unique_id(route: APIRoute):
+    return f"{route.tags[0]}-{route.name}"

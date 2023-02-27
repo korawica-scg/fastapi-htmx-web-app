@@ -13,8 +13,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import PlainTextResponse
+from fastapi.utils import generate_unique_id
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from .dependencies import get_query_token
+from .dependencies import get_query_token, custom_generate_unique_id
 from .config import settings
 
 
@@ -28,7 +29,11 @@ def create_app():
         title='FastAPI and HTMX',
         description="Full Web application with FastAPI for backend and HTMX + CSS for frontend.",
         version="0.0.1",
+
         # dependencies=[Depends(get_query_token)],
+
+        # Default from FastAPI: `generate_unique_id`
+        # generate_unique_id_function=custom_generate_unique_id,
 
         # docs: https://fastapi.tiangolo.com/advanced/extending-openapi/
         openapi_url='/api/v1/openapi.json',
@@ -100,8 +105,10 @@ def create_app():
     # Add routers to the application
     from .routers import api_router
     from .routers import ticket_view
+    from .routers import user_view
     app.include_router(api_router, prefix=f'/api/v{settings.APP_VERSION}')
     app.include_router(ticket_view)
+    app.include_router(user_view)
 
     @app.get(f"/api/v{settings.APP_VERSION}/health", include_in_schema=False)
     async def health() -> JSONResponse:

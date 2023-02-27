@@ -6,6 +6,7 @@ This application will show that TODO application.
 Start running this FastAPI application by follow command line:
 
 ```shell
+$ pip install -r requirements.txt
 $ uvicorn main:app --reload
 ```
 

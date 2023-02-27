@@ -3,11 +3,17 @@ References
 
 - [x] [Python Developers Survey 2021](https://lp.jetbrains.com/python-developers-survey-2021/)
 
-- [ ] [FastAPI Best Practices](https://github.com/zhanymkanov/fastapi-best-practices)
-
+- [ ] (***) [FastAPI Tutorial](https://www.fastapitutorial.com/blogs/)
+- [ ] (***) [FastAPI Best Practices](https://github.com/zhanymkanov/fastapi-best-practices)
 - [x] [Async FastAPI SQLAlchemy](https://github.com/rhoboro/async-fastapi-sqlalchemy)
 - [ ] [Full-Stack FastAPI PostgreSQL](https://github.com/tiangolo/full-stack-fastapi-postgresql)
+- [ ] [FastAPI Framework](https://github.com/Tert0/fastapi-framework)
+ 
 
+
+### Extensions
+
+- [ ] [FastAPI-Users](https://fastapi-users.github.io/fastapi-users/10.4/)
 
 ### Uses-case
 

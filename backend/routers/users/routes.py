@@ -3,7 +3,6 @@ from fastapi import Depends
 from fastapi import Path
 from fastapi import Form
 from fastapi import status
-from .dependencies import get_token_header
 from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate
 from .schemas import UserUpdate as SchemaUserUpdate
@@ -20,7 +19,6 @@ from ..tickets.crud import CreateUserTicket
 users = APIRouter(
     prefix="/users",
     tags=["users"],
-    # dependencies=[Depends(get_token_header)],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Not found"},
     },

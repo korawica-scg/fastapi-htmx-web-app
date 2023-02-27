@@ -1,6 +1,8 @@
 from pydantic import EmailStr
 from pydantic import BaseModel
 from pydantic import Field
+from fastapi import Form
+from typing import Optional, Union
 from ..tickets.schemas import Ticket
 
 
@@ -15,6 +17,19 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     ...
+
+
+class UserCreateForm(UserBase):
+    password: str
+
+    @classmethod
+    def as_form(
+            cls,
+            email: EmailStr = Form(...),
+            username: str = Form(...),
+            password: str = Form(...)
+    ):
+        return cls(email=email, username=username, password=password)
 
 
 class User(UserBase):

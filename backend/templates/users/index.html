@@ -1,5 +1,12 @@
+{% extends 'shared/layouts/base.html' %}
+{% block content %}
 <div>
-    <h1>
-        User Page
-    </h1>
+    {% if content == 'login' %}
+    {% include 'users/partials/login.html' with context %}
+    {% else %}
+    {% include 'users/partials/register.html' with context %}
+    {% endif %}
 </div>
+{% endblock %}
+{% block additional_js %}
+{% endblock %}

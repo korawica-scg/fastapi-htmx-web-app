@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import AsyncIterator
+from typing import AsyncIterator, Union, Type, List, Optional
 from .models import User
 from ...database import get_async_session
 from ...database import BaseCRUD
@@ -10,25 +10,26 @@ from ...securities import verify_password
 from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate
 from .schemas import UserUpdate as SchemaUserUpdate
+from .schemas import UserCreateForm as SchemaUserCreateForm
 
 """
 the Synchronous CRUD functions for get any models from database.
 """
 
 
-def get_user(session: Session, user_id: int) -> User:
+def get_user(session: Session, user_id: int) -> Optional[User]:
     return session.query(User).filter(User.id == user_id).first()
 
 
-def get_user_by_email(session: Session, email: str) -> User:
+def get_user_by_email(session: Session, email: str) -> Optional[User]:
     return session.query(User).filter(User.email == email).first()
 
 
-def get_user_by_username(session: Session, username: str) -> User:
+def get_user_by_username(session: Session, username: str) -> Optional[User]:
     return session.query(User).filter(User.username == username).first()
 
 
-def get_users(session: Session, skip: int = 0, limit: int = 100) -> list[User]:
+def get_users(session: Session, skip: int = 0, limit: int = 100) -> list[Type[User]]:
     return session.query(User).offset(skip).limit(limit).all()
 
 
@@ -45,7 +46,7 @@ class ReadUsers(BaseCRUD):
 
 
 class CreateUser(BaseCRUD):
-    async def execute(self, user: SchemaUserCreate) -> SchemaUser:
+    async def execute(self, user: Union[SchemaUserCreate, SchemaUserCreateForm]) -> SchemaUser:
         async with self.async_session.begin() as session:
 
             # Validate by username value. By default, this will validate from database with

@@ -11,12 +11,10 @@ def authenticate(
         email: str,
         password: str,
 ) -> Optional[User]:
-    user = get_user_by_email(session, email=email)
-    if not user:
+    if user := get_user_by_email(session, email=email):
+        return user if verify_password(password, user.hashed_password) else None
+    else:
         return None
-    if not verify_password(password, user.hashed_password):
-        return None
-    return user
 
 
 def is_active(user: User) -> bool:

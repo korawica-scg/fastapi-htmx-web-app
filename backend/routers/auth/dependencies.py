@@ -15,7 +15,7 @@ from ...securities import ALGORITHM
 from ...config import settings
 from ..users.models import User
 from ..users.crud import get_user, get_user_by_username
-from .schemas import TokenPayload, TokenData
+from .schemas import TokenPayload, TokenDataScope
 from .crud import (
     is_active,
     is_superuser,
@@ -58,7 +58,7 @@ async def get_current_user(
             raise ValidationError
         # OAuth2 with scopes
         token_scopes = payload.get("scopes", [])
-        token_data = TokenData(scopes=token_scopes, username=username)
+        token_data = TokenDataScope(scopes=token_scopes, username=username)
     except (JWTError, ValidationError) as err:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

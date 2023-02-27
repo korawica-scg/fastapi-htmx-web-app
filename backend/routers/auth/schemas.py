@@ -16,6 +16,10 @@ class TokenPayload(BaseModel):
 class TokenData(BaseModel):
     """Token data model"""
     username: Union[str, None] = None
+
+
+class TokenDataScope(TokenData):
+    """Token data model with scope"""
     scopes: List[str] = []
 
 
