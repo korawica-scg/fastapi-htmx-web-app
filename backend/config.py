@@ -14,12 +14,12 @@ from pydantic import (
 from dotenv import load_dotenv
 from functools import lru_cache
 
-load_dotenv(dotenv_path='../.env')
+load_dotenv(dotenv_path=pathlib.Path(__file__).parent.parent / '.env')
 
 
 # docs: https://docs.pydantic.dev/usage/settings/
 class Settings(BaseSettings):
-    """
+    """Base Setting object
     usages:
         ..> settings = Settings()
         ... settings.API_V1_STR
@@ -108,6 +108,9 @@ class Settings(BaseSettings):
 
 class BaseConfig:
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
+    PROJECT_NAME = 'FastAPI and HTMX'
+    SERVER_HOST: AnyHttpUrl = 'http://localhost:8000'
+
     APP_VERSION: int = 1
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost']
 
@@ -142,7 +145,7 @@ class BaseConfig:
         "handlers": {
             "console": {
                 "formatter": "basic",
-                "class": "logging.StreamHandler",
+                "class": "logging.StreamHanfdler",
                 # "stream": "ext://sys.stderr",
                 "stream": "ext://sys.stdout",
                 "level": LOGGING_LEVEL,
@@ -158,7 +161,19 @@ class BaseConfig:
     }
 
     # Email
+    SMTP_TLS: bool = True
+    SMTP_PORT: Optional[int] = int(os.environ.get('SMTP_PORT') or 25)
+    SMTP_HOST: Optional[str] = os.environ.get('SMTP_HOST')
+    SMTP_USER: Optional[str] = os.environ.get('SMTP_USER')
+    SMTP_PASSWORD: Optional[str] = os.environ.get('SMTP_PASSWORD')
+    EMAILS_FROM_EMAIL: Optional[EmailStr] = 'from@example.com'
+    EMAILS_FROM_NAME: Optional[str] = 'Admin'
+
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
+    EMAIL_TEMPLATES_DIR: str = f"{BASE_DIR}/backend/templates/emails"
+    EMAILS_ENABLED: bool = True
+
+    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
 
 
 class DevelopmentConfig(BaseConfig):

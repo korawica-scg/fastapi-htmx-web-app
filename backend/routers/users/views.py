@@ -11,6 +11,7 @@ from ...dependencies import get_templates
 from ...database import get_session
 from ...config import settings
 from ...securities import create_access_token
+from ...utils.utilities import send_test_email
 from ..auth.crud import authenticate
 from .schemas import UserCreateForm
 
@@ -81,3 +82,8 @@ async def login(
     response.headers["HX-Redirect"] = "/ticket/"
     response.status_code = status.HTTP_302_FOUND
     return {}
+
+
+@users.get('/send-email')
+def send_email():
+    send_test_email(email_to='to@example.com')

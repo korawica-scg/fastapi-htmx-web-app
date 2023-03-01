@@ -14,6 +14,7 @@ References
 ### Extensions
 
 - [ ] [FastAPI-Users](https://fastapi-users.github.io/fastapi-users/10.4/)
+- [ ] [Auth with Google](https://stackoverflow.com/questions/63248112/how-to-implement-oauth-to-fastapi-with-client-id-secret)
 
 ### Uses-case
 

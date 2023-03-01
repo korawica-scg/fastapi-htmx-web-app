@@ -40,11 +40,13 @@ async def ticket_read(
         "tickets": [ticket async for ticket in _tickets],
         "title": "Home"
     }
+    request.session['session_value'] = session_key
     response = template.TemplateResponse("tickets/index.html", context)
     response.set_cookie(
         key="session_key",
         value=session_key,
-        expires=(60 * 60 * 24 * 3)
+        expires=(60 * 60 * 24 * 3),
+        secure=True,
     )
     return response
 

@@ -32,6 +32,7 @@ def send_email(
     if settings.SMTP_PASSWORD:
         smtp_options["password"] = settings.SMTP_PASSWORD
     response = message.send(to=email_to, render=environment, smtp=smtp_options)
+    print(f"send email result: {response}")
     logging.info(f"send email result: {response}")
 
 
@@ -41,7 +42,6 @@ def send_test_email(email_to: str) -> None:
     template_str = Path(
         Path(settings.EMAIL_TEMPLATES_DIR) / "test_email.html"
     ).read_text()
-
     send_email(
         email_to=email_to,
         subject_template=subject,
@@ -114,6 +114,6 @@ def generate_password_reset_token(email: str) -> str:
 def verify_password_reset_token(token: str) -> Optional[str]:
     try:
         decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        return decoded_token["email"]
+        return decoded_token["sub"]
     except jwt.JWTError:
         return None
