@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Path
-from fastapi import Form
 from fastapi import status
 from .schemas import User as SchemaUser
 from .schemas import UserCreate as SchemaUserCreate

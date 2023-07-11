@@ -1,6 +1,8 @@
 from datetime import timedelta
 from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException, status, Security
+from fastapi import BackgroundTasks
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from ...database import get_session
@@ -72,13 +74,14 @@ def test_token(
         current_user: User = Security(get_current_user, scopes=["me"]),
 ) -> Any:
     """Test access token"""
-    return current_user
+    return jsonable_encoder(current_user)
 
 
 @auth.post("/password-recovery/{email}", response_model=Message)
 def recover_password(
         email: str,
-        session: Session = Depends(get_session)
+        background_tasks: BackgroundTasks,
+        session: Session = Depends(get_session),
 ) -> Any:
     """Password Recovery"""
     user = get_user_by_email(session, email=email)
@@ -88,8 +91,13 @@ def recover_password(
             detail="The user with this username does not exist in the system.",
         )
     password_reset_token = generate_password_reset_token(email=email)
-    send_reset_password_email(
-        email_to=user.email, email=email, token=password_reset_token
+
+    # docs: https://fastapi.tiangolo.com/tutorial/background-tasks/
+    background_tasks.add_task(
+        send_reset_password_email,
+        email_to=user.email,
+        email=email,
+        token=password_reset_token
     )
     return {"msg": "Password recovery email sent"}
 
